@@ -17,13 +17,19 @@ class NovaPoshtaStatusFetcher implements IStatusFetcher
 
 	public function getStatus($declaration){
 		
-		$response = Http::post('https://api.novaposhta.ua/v2.0/json/', [
-		    'modelName' => 'TrackingDocument',
-		    'calledMethod' => 'getStatusDocuments',
-		    'methodProperties' => [
-		    	'Documents' => [ ['DocumentNumber' => $declaration, 'Phone' => ""]]
-		    ]
-		])->object();
+		$response = retry(4, function () use ($declaration) {
+
+		    return Http::post('https://api.novaposhta.ua/v2.0/json/', [
+			    'modelName' => 'TrackingDocument',
+			    'calledMethod' => 'getStatusDocuments',
+			    'methodProperties' => [
+			    	'Documents' => [ ['DocumentNumber' => $declaration, 'Phone' => ""]]
+			    ]
+			]);
+			
+		}, 500);
+
+		$response = $response->object();
 
 		if($response->success)
 		{
