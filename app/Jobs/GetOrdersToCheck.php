@@ -35,14 +35,12 @@ class GetOrdersToCheck implements ShouldQueue
                             ->where('modify_datetime', '>=', \Carbon\Carbon::now()->subHour())
                             ->whereNotNull('carrier_declaration_num')
                             ->where('carrier_declaration_num', '<>', '')
-                            ->whereRaw('NOT EXISTS (
-                                            select 
-                                              * 
-                                            from 
-                                              `shipping_status_check` 
-                                            where 
-                                              `shipping_status_check`.`order_id` = `svs_orders`.`id` 
-                                          )')
+                            ->whereNotExists(function($query)
+                              {
+                                  $query->select(DB::raw(1))
+                                         ->from('shipping_status_check')
+                                         ->whereColumn('shipping_status_check.order_id', 'svs_orders.id');
+                              })
                             ->where(function (Builder $query) {
                                  $query->where('is_shipping','<>', 'delivered')
                                        ->where('is_shipping','<>', 'not delivered');
