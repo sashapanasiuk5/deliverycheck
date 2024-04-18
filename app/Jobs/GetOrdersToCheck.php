@@ -45,7 +45,7 @@ class GetOrdersToCheck implements ShouldQueue
                                           )')
                             ->where(function (Builder $query) {
                                  $query->where('is_shipping','<>', 'delivered')
-                                       ->orWhere('is_shipping','<>', 'not delivered');
+                                       ->where('is_shipping','<>', 'not delivered');
                              })->get();
 
         foreach ($updated_orders as $order) {

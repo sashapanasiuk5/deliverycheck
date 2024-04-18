@@ -118,9 +118,6 @@ class FetchStatuses implements ShouldQueue
                         Order::where('id',$order->order_id)->update( ['is_shipping' => $order->stop_flag]);
                     }
                 }
-
-
-
             }
         }
     }
